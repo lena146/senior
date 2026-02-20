@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#1a4d5c" />
+  <meta name="description" content="시니어 건강·성향에 맞는 여행 계획 및 AI 가이드" />
+  <title>시니어 여행 가이드 | 건강 맞춤 여행 계획</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="header-inner">
+        <h1 class="logo">🌿 시니어 여행 가이드</h1>
+        <p class="tagline">건강과 성향에 맞는 여행, AI가 함께합니다</p>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Step 1: 건강·성향 설문 -->
+      <section id="section-survey" class="section section-survey">
+        <h2 class="section-title">나에게 맞는 여행 찾기</h2>
+        <p class="section-desc">몇 가지 질문에 답해 주시면 건강 상태와 성향에 맞는 여행지를 추천해 드립니다.</p>
+
+        <form id="survey-form" class="survey-form">
+          <fieldset class="fieldset">
+            <legend>건강·이동</legend>
+            <label class="label">
+              <span class="label-text">이동 편의성</span>
+              <select name="mobility" class="input select" required>
+                <option value="">선택하세요</option>
+                <option value="full">걷기·계단 자유로움</option>
+                <option value="moderate">짧은 거리 보행 가능</option>
+                <option value="limited">휠체어·보조기 사용</option>
+              </select>
+            </label>
+            <label class="label">
+              <span class="label-text">휴식 필요도</span>
+              <select name="rest" class="input select">
+                <option value="low">적음</option>
+                <option value="medium" selected>보통</option>
+                <option value="high">자주 필요</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend>식이·의료</legend>
+            <label class="label">
+              <span class="label-text">식이 제한</span>
+              <select name="diet" class="input select">
+                <option value="none">없음</option>
+                <option value="low_salt">저염</option>
+                <option value="diabetic">당뇨 관리</option>
+                <option value="soft">부드러운 음식 선호</option>
+              </select>
+            </label>
+            <label class="label">
+              <span class="label-text">의료·약 복용</span>
+              <select name="medical" class="input select">
+                <option value="none">특별히 없음</option>
+                <option value="chronic">만성질환 관리 중</option>
+                <option value="medicine">규칙적 약 복용</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend>선호하는 여행 스타일</legend>
+            <label class="label">
+              <span class="label-text">여행 성향</span>
+              <select name="style" class="input select">
+                <option value="relax">휴양·힐링</option>
+                <option value="culture">문화·역사</option>
+                <option value="nature">자연·산책</option>
+                <option value="food">맛집·음식</option>
+              </select>
+            </label>
+            <label class="label">
+              <span class="label-text">선호 기간</span>
+              <select name="duration" class="input select">
+                <option value="1">당일치기</option>
+                <option value="2">1박 2일</option>
+                <option value="3">2박 3일</option>
+                <option value="5">3~5일</option>
+                <option value="7">일주일 이상</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset class="fieldset">
+            <legend>추가 요청 (선택)</legend>
+            <label class="label">
+              <span class="label-text">원하는 지역·키워드</span>
+              <input type="text" name="keyword" class="input" placeholder="예: 제주, 강릉, 온천" maxlength="50" />
+            </label>
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btn-submit">맞춤 여행 계획 받기</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Step 2: 여행 계획 결과 -->
+      <section id="section-plan" class="section section-plan hidden">
+        <div class="back-bar">
+          <button type="button" class="btn btn-text" id="btn-back-survey">← 설문 다시 하기</button>
+        </div>
+        <h2 class="section-title">추천 여행 계획</h2>
+        <div id="plan-content" class="plan-content"></div>
+        <div class="plan-actions">
+          <button type="button" class="btn btn-secondary" id="btn-to-guide">선택한 여행지 AI 가이드 보기</button>
+        </div>
+      </section>
+
+      <!-- Step 3: 여행지 AI 가이드 -->
+      <section id="section-guide" class="section section-guide hidden">
+        <div class="back-bar">
+          <button type="button" class="btn btn-text" id="btn-back-plan">← 계획으로 돌아가기</button>
+        </div>
+        <h2 class="section-title">여행지 AI 가이드</h2>
+        <div class="guide-select-wrap">
+          <label class="label">
+            <span class="label-text">가이드를 볼 여행지</span>
+            <select id="guide-destination" class="input select"></select>
+          </label>
+        </div>
+        <div id="guide-content" class="guide-content">
+          <p class="guide-placeholder">위에서 여행지를 선택하면 건강·성향에 맞는 AI 가이드를 보여드립니다.</p>
+        </div>
+        <div class="guide-actions">
+          <button type="button" class="btn btn-primary" id="btn-refresh-guide">가이드 다시 생성</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>시니어 여행 가이드 · 건강을 생각한 맞춤 여행</p>
+    </footer>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
