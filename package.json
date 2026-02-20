@@ -1,0 +1,9 @@
+{
+  "name": "senior-travel-guide",
+  "version": "1.0.0",
+  "description": "시니어 건강·성향 맞춤 여행 계획 및 AI 가이드",
+  "scripts": {
+    "start": "npx serve . -p ${PORT:-3456}",
+    "build": "echo 'No build step - static site'"
+  }
+}
