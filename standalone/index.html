@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>시니어 여행 플래너</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary: #2d5a4a;
+      --color-primary-light: #3d7a64;
+      --color-primary-dark: #1e3d32;
+      --color-accent: #e8b86d;
+      --color-accent-soft: #f5e6d3;
+      --color-bg: #faf8f5;
+      --color-card: #ffffff;
+      --color-text: #2c2c2c;
+      --color-text-muted: #666;
+      --color-border: #e8e4df;
+      --font-sans: 'Noto Sans KR', -apple-system, sans-serif;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --shadow: 0 4px 20px rgba(45, 90, 74, 0.08);
+      --safe-bottom: 0px;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    #app { min-height: 100vh; max-width: 480px; margin: 0 auto; }
+    .page { padding: 0 20px 100px; }
+    .hidden { display: none !important; }
+
+    .hero { text-align: center; padding: 32px 0 40px; }
+    .hero h1 { margin: 0 0 12px; font-size: 1.75rem; font-weight: 700; color: var(--color-primary-dark); }
+    .hero p { margin: 0; font-size: 1rem; color: var(--color-text-muted); }
+    .cards { display: flex; flex-direction: column; gap: 16px; }
+    .card {
+      display: block;
+      background: var(--color-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--color-border);
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+    }
+    .card:hover { border-color: var(--color-primary-light); }
+    .cardIcon { font-size: 2rem; display: block; margin-bottom: 12px; }
+    .card h2 { margin: 0 0 8px; font-size: 1.15rem; font-weight: 600; }
+    .card p { margin: 0; font-size: 0.9rem; color: var(--color-text-muted); }
+    .badge {
+      position: absolute; top: 16px; right: 16px;
+      padding: 4px 10px; border-radius: 999px;
+      background: var(--color-accent-soft); color: var(--color-primary-dark);
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .footer-note { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-border); font-size: 0.85rem; color: var(--color-text-muted); text-align: center; }
+
+    .nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      max-width: 480px; margin: 0 auto;
+      display: flex; justify-content: space-around; align-items: center;
+      height: 64px; background: var(--color-card);
+      border-top: 1px solid var(--color-border);
+      z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    }
+    .nav a {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 8px 12px; text-decoration: none; color: var(--color-text-muted);
+      font-size: 0.75rem; font-weight: 500; border-radius: var(--radius-sm);
+    }
+    .nav a:hover, .nav a.active { color: var(--color-primary); background: var(--color-accent-soft); }
+
+    .survey-header { padding: 24px 0 16px; }
+    .survey-header h1 { margin: 0 0 8px; font-size: 1.5rem; font-weight: 700; color: var(--color-primary-dark); }
+    .survey-header p { margin: 0 0 16px; font-size: 0.9rem; color: var(--color-text-muted); }
+    .progress { height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+    .progress-bar { height: 100%; background: var(--color-primary); border-radius: 3px; transition: width 0.3s; }
+    .step-label { font-size: 0.85rem; color: var(--color-text-muted); }
+    .section { margin-bottom: 32px; }
+    .section h2 { margin: 0 0 16px; font-size: 1.1rem; font-weight: 600; }
+    .icon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .icon-card {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100px; padding: 16px 8px;
+      background: var(--color-card); border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm); color: var(--color-text);
+      cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow);
+    }
+    .icon-card:hover { border-color: var(--color-primary-light); }
+    .icon-card.selected { border-color: var(--color-primary); background: var(--color-accent-soft); color: var(--color-primary-dark); }
+    .icon-wrap { width: 48px; height: 48px; margin-bottom: 8px; }
+    .icon-wrap svg { width: 100%; height: 100%; }
+    .icon-label { font-size: 0.8rem; font-weight: 500; text-align: center; }
+    .chip-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      padding: 12px 20px; border-radius: 999px;
+      border: 2px solid var(--color-border); background: var(--color-card);
+      font-size: 0.95rem; font-weight: 500; color: var(--color-text);
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .chip:hover { border-color: var(--color-primary-light); }
+    .chip.selected { border-color: var(--color-primary); background: var(--color-primary); color: white; }
+    .survey-footer {
+      position: fixed; bottom: 64px; left: 0; right: 0; max-width: 480px; margin: 0 auto;
+      padding: 16px 20px; background: var(--color-bg); border-top: 1px solid var(--color-border);
+      display: flex; gap: 12px; justify-content: flex-end;
+    }
+    .btn-primary {
+      flex: 1; min-height: 48px; padding: 14px 24px;
+      background: var(--color-primary); color: white; border: none;
+      border-radius: var(--radius-sm); font-size: 1rem; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    .btn-primary:hover { background: var(--color-primary-light); }
+    .btn-secondary {
+      min-height: 48px; padding: 14px 20px;
+      background: var(--color-card); color: var(--color-text);
+      border: 2px solid var(--color-border); border-radius: var(--radius-sm);
+      font-size: 1rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+
+    .curation-header { padding: 24px 0 20px; }
+    .curation-header h1 { margin: 0 0 4px; font-size: 1.4rem; font-weight: 700; }
+    .curation-dest { margin: 0 0 8px; font-size: 1rem; font-weight: 600; color: var(--color-primary); }
+    .curation-summary { margin: 0; font-size: 0.9rem; color: var(--color-text-muted); }
+    .top3-section { margin-bottom: 28px; }
+    .top3-section h2 { margin: 0 0 8px; font-size: 1.1rem; }
+    .top3-desc { margin: 0 0 16px; font-size: 0.85rem; color: var(--color-text-muted); }
+    .top3-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .top3-card {
+      background: var(--color-card); border-radius: var(--radius-sm);
+      padding: 14px; box-shadow: var(--shadow); border: 1px solid var(--color-border);
+    }
+    .top3-label { font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 8px; }
+    .top3-list { margin: 0; padding-left: 1.1em; font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.5; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+    .tab {
+      flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+      padding: 10px 14px; border-radius: 999px;
+      border: 2px solid var(--color-border); background: var(--color-card);
+      font-size: 0.9rem; font-weight: 500; cursor: pointer; font-family: inherit;
+    }
+    .tab.active { border-color: var(--color-primary); background: var(--color-accent-soft); color: var(--color-primary-dark); }
+    .list-card {
+      background: var(--color-card); border-radius: var(--radius-sm);
+      padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow);
+      border: 1px solid var(--color-border);
+    }
+    .list-card h3 { margin: 0 0 4px; font-size: 1rem; font-weight: 600; }
+    .list-card .note { margin: 0 0 6px; font-size: 0.9rem; color: var(--color-text-muted); }
+    .list-card .price { font-size: 0.9rem; font-weight: 600; color: var(--color-primary); }
+    .tag { display: inline-block; padding: 4px 10px; margin: 2px; border-radius: 999px; background: var(--color-accent-soft); color: var(--color-primary-dark); font-size: 0.75rem; }
+    .curation-footer { padding: 24px 0 100px; }
+    .curation-footer .btn-primary { display: block; width: 100%; text-align: center; text-decoration: none; line-height: 48px; }
+
+    .planner-header { padding: 24px 0 20px; }
+    .planner-header h1 { margin: 0 0 4px; font-size: 1.4rem; font-weight: 700; }
+    .planner-meta { margin: 0 0 12px; font-size: 1rem; color: var(--color-primary); font-weight: 500; }
+    .planner-badges { display: flex; gap: 10px; flex-wrap: wrap; }
+    .planner-badge { padding: 6px 12px; border-radius: 999px; background: var(--color-accent-soft); color: var(--color-primary-dark); font-size: 0.85rem; }
+    .planner-tips { margin-bottom: 24px; }
+    .planner-tips h2 { margin: 0 0 10px; font-size: 1.05rem; }
+    .planner-tips ul { margin: 0; padding-left: 1.2em; font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; }
+    .day-card {
+      background: var(--color-card); border-radius: var(--radius);
+      padding: 18px; margin-bottom: 20px; box-shadow: var(--shadow);
+      border: 1px solid var(--color-border);
+    }
+    .day-card h3 { margin: 0 0 14px; font-size: 1.1rem; font-weight: 600; color: var(--color-primary-dark); padding-bottom: 10px; border-bottom: 2px solid var(--color-accent-soft); }
+    .slot { padding: 12px 0; border-bottom: 1px solid var(--color-border); }
+    .slot:last-child { border-bottom: none; }
+    .slot-time { font-size: 0.8rem; color: var(--color-primary); font-weight: 600; }
+    .slot-label { font-size: 1rem; font-weight: 600; }
+    .slot-note { font-size: 0.85rem; color: var(--color-text-muted); }
+    .planner-footer { padding: 24px 0 100px; }
+    .planner-footer .btn-secondary { width: 100%; }
+    .planner-hint { margin: 10px 0 0; font-size: 0.8rem; color: var(--color-text-muted); text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <nav class="nav" id="nav">
+    <a href="#/" id="nav-home" class="active">🏠 홈</a>
+    <a href="#/survey" id="nav-survey">📋 프로필</a>
+    <a href="#/curation" id="nav-curation">✈️ 여행정보</a>
+    <a href="#/planner" id="nav-planner">📅 일정</a>
+  </nav>
+
+  <script>
+(function() {
+  var CURATION = {"제주도":{"summary":"제주는 휴양과 자연, 맛집이 어우러진 시니어 친화 코스가 많습니다.","accommodation":[{"id":1,"name":"제주 한담해변 펜션","type":"펜션","price":"8만원~","note":"바다 전망, 주차 가능","score":4.8,"source":"블로그"},{"id":2,"name":"서귀포 시니어 맞춤 숙소","type":"민박","price":"5만원~","note":"조식 포함, 평탄한 출입","score":4.6,"source":"공공데이터"},{"id":3,"name":"제주 올레길 근처 게스트하우스","type":"게스트하우스","price":"4만원~","note":"걷기 코스 인접","score":4.5,"source":"유튜브"}],"transport":[{"id":1,"name":"제주 시외버스 (공항↔서귀포)","note":"저상버스 다수, 배차 잦음","tip":"제주버스 앱으로 실시간 확인"},{"id":2,"name":"렌터카 (경차/소형)","note":"시니어 할인 업체 있음","tip":"주차 쉬운 숙소 추천"},{"id":3,"name":"관광택시 (4시간/8시간)","note":"맞춤 코스 가능","tip":"체력 고려 시 추천"}],"attraction":[{"id":1,"name":"성산일출봉","note":"완만한 산책로, 전동차 이동 가능","level":"쉬움"},{"id":2,"name":"우도 자전거·전기차","note":"반나절 코스, 휴식 포인트 많음","level":"보통"},{"id":3,"name":"서귀포 올레 6코스","note":"해안 산책, 구간 선택 가능","level":"쉬움~보통"}],"food":[{"id":1,"name":"흑돼지 맛집 (서귀포)","note":"주차·대기 공간 넓음","tags":["맛집","주차"]},{"id":2,"name":"해녀의 집","note":"신선한 해산물, 단체석","tags":["해산물","단체"]},{"id":3,"name":"제주 전통식당","note":"담백한 국물·밥 위주","tags":["전통","담백"]}]},"부산·경남":{"summary":"해운대·기장·통영 등 해안과 문화시설이 잘 갖춰진 지역입니다.","accommodation":[{"id":1,"name":"해운대 근처 호텔","type":"호텔","price":"12만원~","note":"엘리베이터, 해변 인접","score":4.7,"source":"블로그"}],"transport":[{"id":1,"name":"부산 도시철도","note":"저상·엘리베이터 역 많음","tip":"1일권 추천"}],"attraction":[{"id":1,"name":"해운대 해수욕장·동백섬","note":"평탄한 산책로","level":"쉬움"}],"food":[{"id":1,"name":"부산 밀면·돼지국밥","note":"매장 넓은 곳 다수","tags":["밀면","국밥"]}]},"강릉·동해":{"summary":"바다와 산이 맞닿은 동해안, 휴양과 맛집이 잘 어울립니다.","accommodation":[{"id":1,"name":"강릉 경포대 인근 숙소","type":"호텔/펜션","price":"10만원~","note":"해변 인접, 평탄","score":4.6,"source":"블로그"}],"transport":[{"id":1,"name":"강릉 시내버스","note":"경포대·정동진 노선","tip":"버스 시간표 미리 확인"}],"attraction":[{"id":1,"name":"경포대·경포해수욕장","note":"평탄한 해변 산책","level":"쉬움"}],"food":[{"id":1,"name":"강릉 초당두부","note":"담백한 두부 요리","tags":["두부","담백"]}]},"전주·전북":{"summary":"한옥마을과 맛집, 역사가 있는 전주·전북입니다.","accommodation":[{"id":1,"name":"전주 한옥마을 한옥체험","type":"한옥숙박","price":"9만원~","note":"전통 체험, 평탄","score":4.7,"source":"블로그"}],"transport":[{"id":1,"name":"전주 시내버스","note":"한옥마을·경기전 노선","tip":"시내 순환 활용"}],"attraction":[{"id":1,"name":"전주 한옥마을","note":"완만한 오솔길, 휴식 공간 많음","level":"쉬움"}],"food":[{"id":1,"name":"전주 비빔밥·한정식","note":"한옥마을 맛집","tags":["비빔밥","한정식"]}]},"경주":{"summary":"역사와 문화가 살아 있는 경주입니다.","accommodation":[{"id":1,"name":"경주 보문단지 호텔","type":"호텔","price":"11만원~","note":"호텔 밀집, 교통 편","score":4.6,"source":"블로그"}],"transport":[{"id":1,"name":"경주 시내버스·관광버스","note":"주요 유적 연결","tip":"1일권 추천"}],"attraction":[{"id":1,"name":"대릉원·첨성대","note":"평탄한 공원 산책","level":"쉬움"}],"food":[{"id":1,"name":"경주 한정식·황남빵","note":"전통 과자·식사","tags":["한정식","황남빵"]}]},"기타":{"summary":"다양한 지역의 시니어 친화 정보를 추후 추가할 수 있습니다.","accommodation":[{"id":1,"name":"지역별 시니어 맞춤 숙소","type":"다양","price":"문의","note":"평탄한 출입, 조식 옵션","score":4.5,"source":"공공데이터"}],"transport":[{"id":1,"name":"시외버스·철도","note":"저상버스 노선 사전 확인","tip":"지역별 교통정보 앱"}],"attraction":[{"id":1,"name":"지역 공원·해변","note":"평탄한 산책로 위주","level":"쉬움"}],"food":[{"id":1,"name":"지역 대표 음식","note":"담백·저염 옵션 요청","tags":["지역맛"]}]}};
+
+  var profile = {
+    exerciseLevel: null, restNeed: null, conditions: [], travelStyle: [],
+    destination: '', duration: null
+  };
+  try {
+    var saved = localStorage.getItem('seniorTravelProfile');
+    if (saved) profile = Object.assign(profile, JSON.parse(saved));
+  } catch (e) {}
+  function saveProfile() {
+    try { localStorage.setItem('seniorTravelProfile', JSON.stringify(profile)); } catch (e) {}
+  }
+
+  function getDifficulty() {
+    var p = profile, s = 3;
+    if (p.exerciseLevel === 1) s--; if (p.exerciseLevel === 3) s++;
+    if (p.restNeed === 3) s--; if (p.restNeed === 1) s++;
+    if (p.conditions && p.conditions.length > 0) s--;
+    return Math.max(1, Math.min(5, s));
+  }
+  function getPace() {
+    var d = getDifficulty();
+    if (d <= 2) return { activitiesPerDay: 2, restSlots: 2, label: '여유' };
+    if (d >= 4) return { activitiesPerDay: 4, restSlots: 1, label: '활발' };
+    return { activitiesPerDay: 3, restSlots: 1, label: '보통' };
+  }
+  function buildDay(dayIndex, totalDays) {
+    var pace = getPace(), styles = (profile.travelStyle && profile.travelStyle.length) ? profile.travelStyle : ['relax'];
+    var isFirst = dayIndex === 0, isLast = dayIndex === totalDays - 1, slots = [];
+    if (isFirst) {
+      slots.push({ type: 'move', label: '출발·이동', time: '오전', note: '편한 복장, 필요시 중간 휴식' });
+      slots.push({ type: 'rest', label: '숙소 도착·휴식', time: '점심 전후', note: '짐 풀고 잠깐 쉬기' });
+    }
+    if (styles.indexOf('culture') >= 0) slots.push({ type: 'culture', label: '문화·역사 관광', time: '오전', note: '관광지 1곳, 휴식 포인트 포함' });
+    if (pace.restSlots >= 2) slots.push({ type: 'rest', label: '휴식·카페', time: '오후 초', note: '음료·간단한 휴식' });
+    if (styles.indexOf('relax') >= 0) slots.push({ type: 'relax', label: '휴양·산책', time: '오후', note: '해변·공원 등 평탄한 코스' });
+    if (styles.indexOf('activity') >= 0 && pace.activitiesPerDay >= 3) slots.push({ type: 'activity', label: '가벼운 활동', time: '오후', note: '난이도 조절된 코스' });
+    if (pace.restSlots >= 1 && !slots.some(function(s){ return s.type === 'rest' && s.label === '휴식·카페'; })) slots.push({ type: 'rest', label: '휴식·카페', time: '중간', note: '음료·간단한 휴식' });
+    if (isLast) slots.push({ type: 'move', label: '귀가 이동', time: '오후', note: '체크아웃 후 여유 있게' });
+    return { day: dayIndex + 1, dateLabel: (dayIndex + 1) + '일차', slots: slots.slice(0, 6) };
+  }
+  function generateItinerary() {
+    var duration = profile.duration != null ? profile.duration : 2;
+    var totalDays = duration + 1, difficulty = getDifficulty(), pace = getPace();
+    var dest = profile.destination || '제주도';
+    var days = []; for (var d = 0; d < totalDays; d++) days.push(buildDay(d, totalDays));
+    var tips = [];
+    if (pace.restSlots >= 2) tips.push('오전·오후에 짧은 휴식 취하기');
+    if (profile.conditions && profile.conditions.length > 0) tips.push('필요한 약·보조용품 챙기기');
+    if (profile.restNeed >= 2) tips.push('점심 후 30분~1시간 휴식 권장');
+    return { destination: dest, totalDays: totalDays, difficultyLabel: difficulty <= 2 ? '여유' : difficulty >= 4 ? '활발' : '보통', paceLabel: pace.label, days: days, tips: tips };
+  }
+
+  var step = 1;
+  var curCategory = 'accommodation';
+  var itineraryKey = 0;
+
+  var ICONS = {
+    exerciseLow: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M24 40 L32 28 L40 40" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="20" r="4" fill="currentColor"/></svg>',
+    exerciseMid: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M20 44 L28 32 L36 32 L44 44" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="24" r="4" fill="currentColor"/></svg>',
+    exerciseHigh: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M18 46 L26 34 L32 34 L38 34 L46 46" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="22" r="4" fill="currentColor"/></svg>',
+    restLow: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M22 36 L26 36 L30 36 L34 36 L38 36 L42 36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="44" r="3" fill="currentColor"/></svg>',
+    restMid: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M24 38 L28 38 L32 38 L36 38 L40 38" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="46" r="4" fill="currentColor"/></svg>',
+    restHigh: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M26 40 L32 40 L38 40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="48" r="5" fill="currentColor"/></svg>',
+    activity: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M32 18 L32 46 M24 26 L32 18 L40 26 M24 38 L32 46 L40 38" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    relax: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M20 38 Q32 28 44 38" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><circle cx="32" cy="36" r="6" fill="currentColor" opacity="0.5"/></svg>',
+    culture: '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="2" fill="none"/><path d="M32 20 L34 28 L32 32 L30 28 Z" fill="currentColor"/><rect x="28" y="32" width="8" height="14" rx="1" stroke="currentColor" stroke-width="2" fill="none"/><path d="M24 46 L40 46" stroke="currentColor" stroke-width="2"/></svg>',
+    heart: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 42 L8 26 C4 22 4 16 8 12 C12 8 18 8 24 14 C30 8 36 8 40 12 C44 16 44 22 40 26 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>',
+    joint: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="24" r="6" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="24" r="6" stroke="currentColor" stroke-width="2"/><circle cx="36" cy="24" r="6" stroke="currentColor" stroke-width="2"/><path d="M18 24 L30 24" stroke="currentColor" stroke-width="2"/></svg>',
+    sleep: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 8 L24 24 L36 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 28 L20 28 L20 36 L12 36 Z" stroke="currentColor" stroke-width="2" fill="none"/></svg>',
+    eye: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="26" rx="14" ry="10" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="24" cy="26" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M10 14 L24 8 L38 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+    none: '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="12" stroke="currentColor" stroke-width="2" fill="none"/><path d="M18 18 L30 30 M30 18 L18 30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+  };
+
+  function renderHome() {
+    var hasProfile = profile.destination && profile.duration != null;
+    return '<div class="page"><div class="hero"><h1>시니어 여행 플래너</h1><p>건강과 성향에 맞는 여행 정보와 일정을 추천해 드려요</p></div><div class="cards"><a href="#/survey" class="card"><span class="cardIcon">📋</span><h2>나의 프로필</h2><p>건강 상태, 여행 성향, 선호 지역·기간을 선택하세요</p>' + (hasProfile ? '<span class="badge">설정됨</span>' : '') + '</a><a href="#/curation" class="card"><span class="cardIcon">✈️</span><h2>여행 정보</h2><p>숙소·교통·관광·맛집 Top 3와 상세 큐레이션</p></a><a href="#/planner" class="card"><span class="cardIcon">📅</span><h2>맞춤 일정</h2><p>프로필에 맞춘 일정 자동 생성·재생성</p></a></div><p class="footer-note">먼저 나의 프로필을 입력한 뒤, 여행 정보를 보고 일정을 만들어 보세요.</p></div>';
+  }
+
+  function renderSurvey() {
+    var h = '<div class="page"><header class="survey-header"><h1>나의 여행 프로필</h1><p>건강과 성향에 맞는 맞춤 일정을 만들어 드려요</p><div class="progress"><div class="progress-bar" style="width:' + (step/4*100) + '%"></div></div><span class="step-label">' + step + ' / 4</span></header><main style="padding:8px 0">';
+    if (step === 1) {
+      h += '<section class="section"><h2>평소 운동량은 어느 정도인가요?</h2><div class="icon-grid">';
+      [['1','거의 안 함','exerciseLow'],['2','가벼운 산책','exerciseMid'],['3','규칙적 운동','exerciseHigh']].forEach(function(o){
+        h += '<button type="button" class="icon-card' + (profile.exerciseLevel === parseInt(o[0],10) ? ' selected' : '') + '" data-exercise="' + o[0] + '"><span class="icon-wrap">' + ICONS[o[2]] + '</span><span class="icon-label">' + o[1] + '</span></button>';
+      });
+      h += '</div></section>';
+    }
+    if (step === 2) {
+      h += '<section class="section"><h2>여행 중 휴식이 얼마나 필요하신가요?</h2><div class="icon-grid">';
+      [['1','휴식 적게','restLow'],['2','적당히','restMid'],['3','휴식 많이','restHigh']].forEach(function(o){
+        h += '<button type="button" class="icon-card' + (profile.restNeed === parseInt(o[0],10) ? ' selected' : '') + '" data-rest="' + o[0] + '"><span class="icon-wrap">' + ICONS[o[2]] + '</span><span class="icon-label">' + o[1] + '</span></button>';
+      });
+      h += '</div></section><section class="section"><h2>걱정되는 건강 이슈가 있다면 (복수 선택)</h2><div class="icon-grid">';
+      [['heart','심혈관'],['joint','관절'],['sleep','수면/피로'],['eye','눈/피로'],['none','해당 없음']].forEach(function(o){
+        var sel = (o[0]==='none' ? profile.conditions.length===0 : profile.conditions && profile.conditions.indexOf(o[0])>=0);
+        h += '<button type="button" class="icon-card' + (sel ? ' selected' : '') + '" data-condition="' + o[0] + '"><span class="icon-wrap">' + ICONS[o[0]] + '</span><span class="icon-label">' + o[1] + '</span></button>';
+      });
+      h += '</div></section>';
+    }
+    if (step === 3) {
+      h += '<section class="section"><h2>선호하는 여행 스타일 (복수 선택)</h2><div class="icon-grid">';
+      [['activity','활동적인'],['relax','휴양·휴식'],['culture','문화·역사']].forEach(function(o){
+        var sel = profile.travelStyle && profile.travelStyle.indexOf(o[0]) >= 0;
+        h += '<button type="button" class="icon-card' + (sel ? ' selected' : '') + '" data-style="' + o[0] + '"><span class="icon-wrap">' + ICONS[o[0]] + '</span><span class="icon-label">' + o[1] + '</span></button>';
+      });
+      h += '</div></section>';
+    }
+    if (step === 4) {
+      h += '<section class="section"><h2>가고 싶은 여행지는?</h2><div class="chip-grid">';
+      ['제주도','부산·경남','강릉·동해','전주·전북','경주','기타'].forEach(function(d){
+        h += '<button type="button" class="chip' + (profile.destination === d ? ' selected' : '') + '" data-dest="' + d + '">' + d + '</button>';
+      });
+      h += '</div></section><section class="section"><h2>예상 여행 기간</h2><div class="chip-grid">';
+      [[1,'1박 2일'],[2,'2박 3일'],[3,'3박 4일'],[4,'4박 5일 이상']].forEach(function(o){
+        h += '<button type="button" class="chip' + (profile.duration === o[0] ? ' selected' : '') + '" data-duration="' + o[0] + '">' + o[1] + '</button>';
+      });
+      h += '</div></section>';
+    }
+    h += '</main><div class="survey-footer">';
+    if (step > 1) h += '<button type="button" class="btn-secondary" id="btn-prev">이전</button>';
+    h += '<button type="button" class="btn-primary" id="btn-next">' + (step === 4 ? '여행 정보 보기' : '다음') + '</button></div></div>';
+    return h;
+  }
+
+  function renderCuration() {
+    var dest = profile.destination || '제주도';
+    var data = CURATION[dest] || CURATION['제주도'];
+    var catKeys = ['accommodation','transport','attraction','food'];
+    var catLabels = { accommodation: '숙소', transport: '교통', attraction: '관광지', food: '음식' };
+    var h = '<div class="page"><header class="curation-header"><h1>여행 정보 큐레이션</h1><p class="curation-dest">' + dest + '</p><p class="curation-summary">' + data.summary + '</p></header><section class="top3-section"><h2>Top 3 요약</h2><p class="top3-desc">각 카테고리 상위 3곳을 정리했어요.</p><div class="top3-grid">';
+    catKeys.forEach(function(k){
+      var arr = data[k] || [];
+      h += '<div class="top3-card"><span class="top3-label">' + catLabels[k] + '</span><ul class="top3-list">';
+      arr.slice(0,3).forEach(function(item){ h += '<li>' + (item.name || item.type) + (item.note ? ' · ' + item.note : '') + '</li>'; });
+      h += '</ul></div>';
+    });
+    h += '</div></section><section class="section"><h2>카테고리별 상세</h2><div class="tabs">';
+    catKeys.forEach(function(k){
+      h += '<button type="button" class="tab' + (curCategory === k ? ' active' : '') + '" data-cat="' + k + '">' + catLabels[k] + '</button>';
+    });
+    h += '</div><div id="curation-list">';
+    (data[curCategory] || []).forEach(function(item){
+      h += '<div class="list-card"><h3>' + (item.name || item.type) + '</h3>';
+      if (item.type) h += '<span style="font-size:0.8rem;color:#666">' + item.type + '</span> ';
+      if (item.score) h += '<span style="font-size:0.8rem">★ ' + item.score + '</span> ';
+      if (item.source) h += '<span style="font-size:0.8rem;color:#666">' + item.source + '</span>';
+      if (item.note) h += '<p class="note">' + item.note + '</p>';
+      if (item.price) h += '<p class="price">' + item.price + '</p>';
+      if (item.tip) h += '<p class="note">💡 ' + item.tip + '</p>';
+      if (item.level) h += '<span style="font-size:0.8rem;color:#666">난이도: ' + item.level + '</span>';
+      if (item.tags && item.tags.length) { h += '<p>'; item.tags.forEach(function(t){ h += '<span class="tag">' + t + '</span>'; }); h += '</p>'; }
+      h += '</div>';
+    });
+    h += '</div></section><div class="curation-footer"><a href="#/planner" class="btn-primary">이 정보로 일정 만들기</a></div></div>';
+    return h;
+  }
+
+  function renderPlanner() {
+    var it = generateItinerary();
+    var h = '<div class="page"><header class="planner-header"><h1>맞춤 일정 플래너</h1><p class="planner-meta">' + it.destination + ' · ' + it.totalDays + '일</p><div class="planner-badges"><span class="planner-badge">난이도: ' + it.difficultyLabel + '</span><span class="planner-badge">페이스: ' + it.paceLabel + '</span></div></header><section class="planner-tips"><h2>이번 일정 팁</h2><ul>';
+    it.tips.forEach(function(t){ h += '<li>' + t + '</li>'; });
+    h += '</ul></section>';
+    it.days.forEach(function(day){
+      h += '<article class="day-card"><h3>' + day.dateLabel + '</h3><ul style="list-style:none;margin:0;padding:0">';
+      day.slots.forEach(function(slot){
+        h += '<li class="slot"><span class="slot-time">' + slot.time + '</span><br><span class="slot-label">' + slot.label + '</span>' + (slot.note ? '<br><span class="slot-note">' + slot.note + '</span>' : '') + '</li>';
+      });
+      h += '</ul></article>';
+    });
+    h += '<div class="planner-footer"><button type="button" class="btn-secondary" id="btn-regen">일정 다시 만들기</button><p class="planner-hint">프로필을 바꾸면 더 맞는 일정이 만들어져요.</p></div></div>';
+    return h;
+  }
+
+  function render() {
+    var hash = (location.hash || '#/').slice(1) || 'home';
+    var path = hash.split('/')[0] || 'home';
+    var app = document.getElementById('app');
+    if (path === 'survey') app.innerHTML = renderSurvey();
+    else if (path === 'curation') app.innerHTML = renderCuration();
+    else if (path === 'planner') app.innerHTML = renderPlanner();
+    else app.innerHTML = renderHome();
+
+    document.querySelectorAll('.nav a').forEach(function(a){
+      a.classList.remove('active');
+      if ((a.getAttribute('href') === '#/' && path === 'home') || (a.getAttribute('href') === '#/' + path)) a.classList.add('active');
+    });
+
+    if (path === 'survey') {
+      app.querySelectorAll('.icon-card[data-exercise]').forEach(function(btn){
+        btn.onclick = function(){ profile.exerciseLevel = parseInt(btn.dataset.exercise,10); saveProfile(); render(); };
+      });
+      app.querySelectorAll('.icon-card[data-rest]').forEach(function(btn){
+        btn.onclick = function(){ profile.restNeed = parseInt(btn.dataset.rest,10); saveProfile(); render(); };
+      });
+      app.querySelectorAll('.icon-card[data-condition]').forEach(function(btn){
+        btn.onclick = function(){
+          var v = btn.dataset.condition;
+          if (v === 'none') { profile.conditions = []; } else {
+            profile.conditions = profile.conditions || [];
+            var i = profile.conditions.indexOf(v);
+            if (i >= 0) profile.conditions.splice(i,1); else { profile.conditions = profile.conditions.filter(function(c){ return c !== 'none'; }); profile.conditions.push(v); }
+          }
+          saveProfile(); render();
+        };
+      });
+      app.querySelectorAll('.icon-card[data-style]').forEach(function(btn){
+        btn.onclick = function(){
+          var v = btn.dataset.style;
+          profile.travelStyle = profile.travelStyle || [];
+          var i = profile.travelStyle.indexOf(v);
+          if (i >= 0) profile.travelStyle.splice(i,1); else profile.travelStyle.push(v);
+          saveProfile(); render();
+        };
+      });
+      app.querySelectorAll('.chip[data-dest]').forEach(function(btn){
+        btn.onclick = function(){ profile.destination = btn.dataset.dest; saveProfile(); render(); };
+      });
+      app.querySelectorAll('.chip[data-duration]').forEach(function(btn){
+        btn.onclick = function(){ profile.duration = parseInt(btn.dataset.duration,10); saveProfile(); render(); };
+      });
+      var btnNext = document.getElementById('btn-next');
+      if (btnNext) btnNext.onclick = function(){ if (step < 4) { step++; render(); } else { location.hash = '#/curation'; render(); } };
+      var btnPrev = document.getElementById('btn-prev');
+      if (btnPrev) btnPrev.onclick = function(){ if (step > 1) { step--; render(); } };
+    }
+
+    if (path === 'curation') {
+      app.querySelectorAll('.tab[data-cat]').forEach(function(btn){
+        btn.onclick = function(){ curCategory = btn.dataset.cat; render(); };
+      });
+    }
+
+    if (path === 'planner') {
+      var btnRegen = document.getElementById('btn-regen');
+      if (btnRegen) btnRegen.onclick = function(){ itineraryKey++; render(); };
+    }
+  }
+
+  var lastPath = '';
+  function onRoute() {
+    var hash = (location.hash || '#/').slice(1) || 'home';
+    var path = hash.split('/')[0] || 'home';
+    if (path === 'survey' && lastPath !== 'survey') step = 1;
+    lastPath = path;
+    render();
+  }
+  window.addEventListener('hashchange', onRoute);
+  window.addEventListener('load', function(){ onRoute(); });
+})();
+  </script>
+</body>
+</html>

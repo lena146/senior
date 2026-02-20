@@ -1,0 +1,56 @@
+:root {
+  --color-primary: #2d5a4a;
+  --color-primary-light: #3d7a64;
+  --color-primary-dark: #1e3d32;
+  --color-accent: #e8b86d;
+  --color-accent-soft: #f5e6d3;
+  --color-bg: #faf8f5;
+  --color-card: #ffffff;
+  --color-text: #2c2c2c;
+  --color-text-muted: #666;
+  --color-border: #e8e4df;
+  --font-sans: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --shadow: 0 4px 20px rgba(45, 90, 74, 0.08);
+  --safe-bottom: env(safe-area-inset-bottom, 0);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+  min-height: 100dvh;
+  padding-bottom: calc(80px + var(--safe-bottom));
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  font-family: inherit;
+}
+
+/* 터치 영역 최소 44px 권장 */
+@media (max-width: 768px) {
+  html {
+    font-size: clamp(14px, 4vw, 16px);
+  }
+}

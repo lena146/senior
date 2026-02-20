@@ -1,0 +1,212 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px 100px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.header {
+  padding: 24px 0 16px;
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  z-index: 1;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.header p {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.progress {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.stepLabel {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.main {
+  flex: 1;
+  padding: 8px 0;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section h2 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.iconCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  padding: 16px 8px;
+  background: var(--color-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+}
+
+.iconCard:hover,
+.iconCard:focus-visible {
+  border-color: var(--color-primary-light);
+  outline: none;
+}
+
+.iconCard[data-selected="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-accent-soft);
+  color: var(--color-primary-dark);
+}
+
+.iconWrap {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  color: inherit;
+}
+
+.iconWrap svg {
+  width: 100%;
+  height: 100%;
+}
+
+.iconLabel {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 2px solid var(--color-border);
+  background: var(--color-card);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.chip:hover,
+.chip:focus-visible {
+  border-color: var(--color-primary-light);
+  outline: none;
+}
+
+.chip[data-selected="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  padding-bottom: calc(16px + var(--safe-bottom));
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btnPrimary {
+  flex: 1;
+  min-height: 48px;
+  padding: 14px 24px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btnPrimary:hover,
+.btnPrimary:focus-visible {
+  background: var(--color-primary-light);
+  outline: none;
+}
+
+.btnSecondary {
+  min-height: 48px;
+  padding: 14px 20px;
+  background: var(--color-card);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.btnSecondary:hover,
+.btnSecondary:focus-visible {
+  border-color: var(--color-primary-light);
+  outline: none;
+}
+
+@media (min-width: 480px) {
+  .iconGrid {
+    gap: 16px;
+  }
+  .iconCard {
+    min-height: 110px;
+  }
+  .iconWrap {
+    width: 56px;
+    height: 56px;
+  }
+}
